@@ -10,7 +10,7 @@ contract Controller {
     entityAddress = msg.sender;
   }
 
-  mapping(address => bool) verifiedUsers;
+  mapping(string => bool) verifiedUsers;
 
   modifier isMain(address _userMain) {
     require(msg.sender == _userMain);
@@ -22,12 +22,12 @@ contract Controller {
   //
   // }
 
-  function verifyUser(address _userPub, address _userMain)
+  function verifyUser(string _userPub, address _userMain)
   public isMain(_userMain) {
     verifiedUsers[_userPub] = true;
   }
 
-  function revokeVerification(address _userPub, address _userMain)
+  function revokeVerification(string _userPub, address _userMain)
   public isMain(_userMain) {
     verifiedUsers[_userPub] = false;
   }

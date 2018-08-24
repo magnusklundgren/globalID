@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 contract User {
   address main;
-  bytes32 pub;
+  string pub;
   bytes32 biometrics; //This is encrypted.
   string name;
   bytes32 id;
@@ -14,7 +14,7 @@ contract User {
     return main;
   }
 
-  function getPub() public returns(bytes32){
+  function getPub() public returns(string){
     return pub;
   }
 
@@ -39,7 +39,7 @@ contract User {
   address[] whitelist;
   mapping(address => hashEntry) public hashes; //mapping id -> symmetric key hash
 
-  constructor(bytes32 _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
+  constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
   public {
     main = msg.sender;
     pub  = _pubUser;

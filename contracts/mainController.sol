@@ -7,27 +7,18 @@ contract mainController is Controller {
 
     /*events*/
 
-    mapping(address => bool) public userList;
+    mapping(bytes32 => bool) public userList;
 
-    struct keys {
-      string pubString;
-      string priString;
-    }
-
-    function generatePub() private returns (keys){
+    function generatePub() private returns (string memory, string memory){
       // Generate new public-private keypair
       // Right now it's just some random address for illustration.
-      keys memory genKeys;
-      genKeys.pubString = "sdf";
-      genKeys.priString = "123";
-
-      return (genKeys);
+      return ("sdf", "sdf");
     }
 
     function update(User _user) public {
-      string memory publicKey;
-      string memory privateKey;
-      (publicKey, privateKey) = generatePub();
+      /* string memory publicKey; */
+      /* string memory privateKey; */
+      (string memory publicKey, string memory privateKey) = generatePub();
       // _user.pub = publicKey; // fix overwriting values in other contracts
       // Do something here to extract privateKey to user, while not putting it
       // on the blockchain
@@ -47,15 +38,13 @@ contract mainController is Controller {
     }
 
     function addUser(bytes32 _biometrics, string _name, bytes32 _id) public {
-      string publicKey;
-      string privateKey;
-      (publicKey, privateKey) = generatePub();
+      (string memory publicKey, string memory privateKey) = generatePub();
       address newUser = new User(publicKey, _biometrics, _name, _id);
-      userList[publicKey] = true;
+      userList[_id] = true;
       //send _privateKey to the user.
     }
 
-    function auth(address _privateKey, bytes32 _bio) public returns(bool) {
+    function auth(string _privateKey, bytes32 _bio) public returns(bool) {
       //decrypt bio;
       //bool res = (biometrics == _bio); //check decrypted biometrics with parsed variable _bio
       bool res = true;
