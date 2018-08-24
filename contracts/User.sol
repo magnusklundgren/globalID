@@ -28,7 +28,7 @@ contract User {
   }
 
   modifier isMain() {
-    require(msg.sender == owner);
+    require(msg.sender == main);
     _;
   }
 
@@ -63,11 +63,11 @@ contract User {
 
   function killUser() public isMain{
     //Do something else than overwriting values maybe
-    pub = 0x0;
+    pub = "empty";
     main = 0x0;
-    biometrics = 0;
+    biometrics = 0x123;
     name = "";
-    id = 0;
+    id = 0x123;
   }
 
   function transferMain(address _newMain) public isMain{

@@ -7,7 +7,7 @@ contract Controller {
   event ReturnBool(bool res);
 
   //mappings
-  mapping(string => bool) verifiedUsers;
+  mapping(bytes32 => bool) verifiedUsers;
 
   //modifiers
   modifier isMain(address _userMain) {
@@ -19,14 +19,14 @@ contract Controller {
     entityAddress = msg.sender;
   }
 
-  function verifyUser(string _userPub, address _userMain)
+  function verifyUser(bytes32 _userID, address _userMain)
   public isMain(_userMain) {
-    verifiedUsers[_userPub] = true;
+    verifiedUsers[_userID] = true;
   }
 
-  function revokeVerification(string _userPub, address _userMain)
+  function revokeVerification(bytes32 _userID, address _userMain)
   public isMain(_userMain) {
-    verifiedUsers[_userPub] = false;
+    verifiedUsers[_userID] = false;
   }
 
 }

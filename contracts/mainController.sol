@@ -23,10 +23,10 @@ contract mainController is Controller {
   }
 
   function killUser(User _user) public {
-    userPub  = _user.getPub();
-    userMain = _user.getMain();
-    revokeVerification(userPub, userMain);
-    delete(userList[userPub]);
+    bytes32 userID  = _user.getID();
+    address userMain = _user.getMain();
+    revokeVerification(userID, userMain);
+    delete(userList[userID]);
 
     _user.killUser();
   }
@@ -47,7 +47,7 @@ contract mainController is Controller {
   }
 
   function transferMain(User _user, address _newMain) public {
-    revokeVerification(_user.getPub(), _user.getMain());
+    revokeVerification(_user.getID(), _user.getMain());
     _user.transferMain(_newMain);
   }
 }
