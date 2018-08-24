@@ -12,11 +12,13 @@ contract User {
   struct hashEntry{
     bytes32 dataHash;
     bytes32 keyHash;
-    // mapping(address => bytes32) public dataHashes; //mapping id -> data hash
   }
 
   //events
   event ReturnBool(bool res);
+  event ReturnAddr(address res);
+  event ReturnStr(string res);
+  event Returnbytes(bytes32 res);
 
   //mappings
   mapping(address => hashEntry) public hashes; //mapping id -> symmetric key hash
@@ -32,6 +34,27 @@ contract User {
     _;
   }
 
+  modifier isPub() {
+    require(msg.sender == pub);
+  }
+
+  modifier validSender(address sender){
+    require (msg.sender = sender || msg.sender == pub);
+    _;
+  }
+
+  modifier isWhitelist(address _subKey) {
+    if (_subKey == pub){
+      _;
+      return;
+    }
+    for(uint i = 0; i < whitelist.length; i++){
+      if (whitelist[i] == _subKey){
+        _;
+      }
+    }
+  }
+
   constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
   public {
     main = msg.sender;
@@ -39,25 +62,32 @@ contract User {
     biometrics = _biometrics;
     name = _name;
     id = _id;
+    addWhitelist(main)
+
   }
 
   function getMain() public returns(address){
+    emit ReturnAddr(main);
     return main;
   }
 
   function getPub() public returns(string){
+    emit ReturnStr(pub);
     return pub;
   }
 
   function getID() public returns(bytes32){
+    emit ReturnBytes(id);
     return id;
   }
 
   function getName() public returns(string){
+    emit ReturnStr(name);
     return name;
   }
 
   function getBio() public returns(bytes32){
+    emit ReturnBytes(biometrics);
     return biometrics;
   }
 
@@ -78,8 +108,14 @@ contract User {
     pub = _pubKey;
   }
 
+  function readSymKey(address hashID) isPub{
+    bytes32 hashedKey = hashes[hashID].hashKey;
+
+    //bytes32 symKey = decrypt(hashedKey, privateKey);
+  }
+
   function addWhitelist(address _subKey)
-    public notMain(_subKey) returns(bool){
+    public returns(bool){
       for (uint i = 0; i < whitelist.length; i++){
         if (whitelist[i] == _subKey){
           emit ReturnBool(false);
@@ -95,7 +131,7 @@ contract User {
     //Right now this leaves an empty index in the array.
     //Can be optimized to reduce array size.
     uint i = whitelist.length;
-    while(i >= 0){
+    for (uint i = 0; i < whitelist.length; i++){
       if (whitelist[i] == _subKey){
         delete whitelist[i];
         emit ReturnBool(true);
@@ -106,11 +142,13 @@ contract User {
     return false;
   }
 
-  function addDocs(address _thirdParty, bytes32 _dataHash, bytes32 _keyHash) public {
+  function addDocs(address _thirdParty, bytes32 _dataHash, bytes32 _keyHash)
+  public isWhitelist(_thirdParty) validSender(_thirdParty) {
     hashes[_thirdParty] = hashEntry(_dataHash, _keyHash);
   }
 
-  function removeDocs(address _thirdParty) public {
+  function removeDocs(address _thirdParty)
+  public isWhitelist(_thirdParty) validSender(_thirdParty) {
     delete(hashes[_thirdParty]);
   }
 
