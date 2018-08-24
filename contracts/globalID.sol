@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 
-contract Controller {
+contract globalID {
   address entityAddress;
 
   /*events*/
@@ -43,7 +43,7 @@ contract Controller {
 
 }
 
-contract MainController is Controller {
+contract MainController is globalID {
 
     /*events*/
     event ReturnPub(address _publickKey);
@@ -80,7 +80,6 @@ contract MainController is Controller {
       //it doesn't seem straighforward to overwrite in a contract.
       bool user = true;
       bool dead = true;
-
     }
 
     function addUser(bytes32 _biometrics, string _name, bytes32 _id) public {
@@ -106,7 +105,7 @@ contract MainController is Controller {
     }
 }
 
-contract SubController is Controller {
+contract SubController is globalID {
 
 }
 

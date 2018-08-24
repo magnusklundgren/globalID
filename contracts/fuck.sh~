@@ -1,0 +1,2 @@
+qcli generate 600
+solar deploy mainController.js --force
