@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 import "controller.sol";
 import "User.sol";
 
-
 contract mainController is Controller {
 
   //mappings
@@ -51,3 +50,6 @@ contract mainController is Controller {
     _user.transferMain(_newMain);
   }
 }
+
+
+

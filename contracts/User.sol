@@ -57,6 +57,7 @@ contract User {
 
   constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
   public {
+  constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id) public {
     main = msg.sender;
     pub  = _pubUser;
     biometrics = _biometrics;
@@ -91,7 +92,7 @@ contract User {
     return biometrics;
   }
 
-  function killUser() public isMain{
+  function killUser() public isMain {
     //Do something else than overwriting values maybe
     pub = "empty";
     main = 0x0;
@@ -100,11 +101,11 @@ contract User {
     id = 0x123;
   }
 
-  function transferMain(address _newMain) public isMain{
+  function transferMain(address _newMain) public {
     main = _newMain;
   }
 
-  function updatePublic(string _pubKey) public isMain{
+  function updatePublic(string _pubKey) public isMain {
     pub = _pubKey;
   }
 
