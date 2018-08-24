@@ -7,8 +7,39 @@ contract User {
   string name;
   bytes32 id;
 
+  address[] whitelist;
+
+  struct hashEntry{
+    bytes32 dataHash;
+    bytes32 keyHash;
+    // mapping(address => bytes32) public dataHashes; //mapping id -> data hash
+  }
+
   //events
   event ReturnBool(bool res);
+
+  //mappings
+  mapping(address => hashEntry) public hashes; //mapping id -> symmetric key hash
+
+  //modifiers
+  modifier notMain(address _subKey) {
+    require(_subKey != main);
+    _;
+  }
+
+  modifier isMain() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
+  public {
+    main = msg.sender;
+    pub  = _pubUser;
+    biometrics = _biometrics;
+    name = _name;
+    id = _id;
+  }
 
   function getMain() public returns(address){
     return main;
@@ -30,27 +61,21 @@ contract User {
     return biometrics;
   }
 
-  struct hashEntry{
-    bytes32 dataHash;
-    bytes32 keyHash;
-    // mapping(address => bytes32) public dataHashes; //mapping id -> data hash
+  function killUser() public isMain{
+    //Do something else than overwriting values maybe
+    pub = 0x0;
+    main = 0x0;
+    biometrics = 0;
+    name = "";
+    id = 0;
   }
 
-  address[] whitelist;
-  mapping(address => hashEntry) public hashes; //mapping id -> symmetric key hash
-
-  constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
-  public {
-    main = msg.sender;
-    pub  = _pubUser;
-    biometrics = _biometrics;
-    name = _name;
-    id = _id;
+  function transferMain(address _newMain) public isMain{
+    main = _newMain;
   }
 
-  modifier notMain(address _subKey) {
-      require(_subKey != main);
-      _;
+  function updatePublic(string _pubKey) public isMain{
+    pub = _pubKey;
   }
 
   function addWhitelist(address _subKey)
