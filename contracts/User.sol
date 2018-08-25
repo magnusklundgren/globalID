@@ -6,8 +6,9 @@ contract User {
   bytes32 biometrics; //This is encrypted.
   string name;
   bytes32 id;
+  bool dead;
 
-  address[] whitelist;
+  mapping(address => bool) whitelist;
 
   struct hashEntry{
     bytes32 dataHash;
@@ -20,46 +21,30 @@ contract User {
   event ReturnStr(string res);
   event ReturnBytes(bytes32 res);
 
-  //mappings
-  mapping(address => hashEntry) public hashes; //mapping id -> symmetric key hash
+  //mapping id -> symmetric key hash
+  mapping(address => hashEntry) public hashes;
+
 
   //modifiers
   modifier notMain(address _subKey) {
-    require(_subKey != main);
+    assert(_subKey != main);
     _;
   }
 
   modifier isMain() {
-    require(msg.sender == main);
+    assert(msg.sender == main);
     _;
-  }
-
-  /*msg.sender is address, and pub is string, resulting in TypeError*/
-  // modifier isPub() {
-  //   require(msg.sender == pub);
-  //   _;
-  // }
-  modifier isPub(){
-      _;
   }
 
   modifier validSender(address sender){
     //require (msg.sender == sender || msg.sender == pub);
-    require (msg.sender == sender);
+    assert (msg.sender == sender);
     _;
   }
 
   modifier isWhitelist(address _subKey) {
-    /*TypeError*/
-    //if (_subKey == pub){
-    //  _;
-    // return;
-    //}
-    for(uint i = 0; i < whitelist.length; i++){
-      if (whitelist[i] == _subKey){
-        _;
-      }
-    }
+    assert (whitelist[_subKey]);
+      _;
   }
 
   constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
@@ -69,12 +54,8 @@ contract User {
     biometrics = _biometrics;
     name = _name;
     id = _id;
+    dead = false;
     addWhitelist(main);
-  }
-
-  function getMain() public returns(address){
-    emit ReturnAddr(main);
-    return main;
   }
 
   function getPub() public returns(string){
@@ -87,23 +68,13 @@ contract User {
     return id;
   }
 
-  function getName() public returns(string){
-    emit ReturnStr(name);
-    return name;
-  }
-
-  function getBio() public returns(bytes32){
-    emit ReturnBytes(biometrics);
-    return biometrics;
+  function getMain() public returns(address){
+    emit ReturnAddr(main);
+    return main;
   }
 
   function killUser() public isMain {
-    //Do something else than overwriting values maybe
-    pub = "empty";
-    main = 0x0;
-    biometrics = 0x123;
-    name = "";
-    id = 0x123;
+      dead = true;
   }
 
   function transferMain(address _newMain) public {
@@ -114,34 +85,28 @@ contract User {
     pub = _pubKey;
   }
 
-  function readSymKey(address hashID) isPub{
+  function readSymKey(address hashID) {
     bytes32 hashedKey = hashes[hashID].keyHash;
 
     //bytes32 symKey = decrypt(hashedKey, privateKey);
   }
 
-  function addWhitelist(address _subKey)
-    public returns(bool){
-      for (uint i = 0; i < whitelist.length; i++){
-        if (whitelist[i] == _subKey){
-          emit ReturnBool(false);
-          return false;
-        }
-      }
-      whitelist.push(_subKey);
-      emit ReturnBool(true);
-      return true;
+  function addWhitelist(address _subKey) public returns(bool) {
+    if (whitelist[_subKey]) {
+      emit ReturnBool(false);
+      return false;
+    }
+    whitelist[_subKey] = true;
+    emit ReturnBool(true);
+    return true;
   }
 
-  function removeWhiteList(address _subKey) public notMain(_subKey) returns(bool){
-    //Right now this leaves an empty index in the array.
-    //Can be optimized to reduce array size.
-    for (uint i = 0; i < whitelist.length; i++){
-      if (whitelist[i] == _subKey){
-        delete whitelist[i];
-        emit ReturnBool(true);
-        return true;
-      }
+  function removeWhiteList(address _subKey) public notMain(_subKey) returns(bool) {
+    if (whitelist[_subKey]) {
+      // Setting it to false is the same as delete.
+      whitelist[_subKey] = false;
+      emit ReturnBool(true);
+      return true;
     }
     emit ReturnBool(false);
     return false;
