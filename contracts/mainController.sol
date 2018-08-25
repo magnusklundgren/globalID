@@ -50,6 +50,3 @@ contract mainController is Controller {
     _user.transferMain(_newMain);
   }
 }
-
-
-
