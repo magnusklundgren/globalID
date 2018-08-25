@@ -1,4 +1,5 @@
 pragma solidity ^0.4.24;
+import "User.sol";
 
 contract Controller {
   address entityAddress;
@@ -29,14 +30,14 @@ contract Controller {
     verifiedUsers[_userID] = false;
   }
 
-  function hashKey(User _user, _symKey) public {
-    string pubKey = _user.getPub();
+  function hashKey(User _user, bytes32 _symKey) public returns(bytes32){
+    string memory pubKey = _user.getPub();
     //bytes32 keyHashed = encrypt(_symKey, pubKey);
-    bytes32 keyHashed = 0x5678
+    bytes32 keyHashed = 0x5678;
     return keyHashed;
   }
 
-  function addDocs(User _user, _symKey, _dataHashed){
+  function addDocs(User _user, bytes32 _symKey, bytes32 _dataHashed){
     bytes32 keyHashed = hashKey(_user, _symKey);
     _user.addDocs(entityAddress, _dataHashed, keyHashed);
   }

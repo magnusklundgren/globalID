@@ -18,7 +18,7 @@ contract User {
   event ReturnBool(bool res);
   event ReturnAddr(address res);
   event ReturnStr(string res);
-  event Returnbytes(bytes32 res);
+  event ReturnBytes(bytes32 res);
 
   //mappings
   mapping(address => hashEntry) public hashes; //mapping id -> symmetric key hash
@@ -34,20 +34,27 @@ contract User {
     _;
   }
 
-  modifier isPub() {
-    require(msg.sender == pub);
+  /*msg.sender is address, and pub is string, resulting in TypeError*/
+  // modifier isPub() {
+  //   require(msg.sender == pub);
+  //   _;
+  // }
+  modifier isPub(){
+      _;
   }
 
   modifier validSender(address sender){
-    require (msg.sender = sender || msg.sender == pub);
+    //require (msg.sender == sender || msg.sender == pub);
+    require (msg.sender == sender);
     _;
   }
 
   modifier isWhitelist(address _subKey) {
-    if (_subKey == pub){
-      _;
-      return;
-    }
+    /*TypeError*/
+    //if (_subKey == pub){
+    //  _;
+    // return;
+    //}
     for(uint i = 0; i < whitelist.length; i++){
       if (whitelist[i] == _subKey){
         _;
@@ -57,14 +64,12 @@ contract User {
 
   constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id)
   public {
-  constructor(string _pubUser,  bytes32 _biometrics, string _name, bytes32 _id) public {
     main = msg.sender;
     pub  = _pubUser;
     biometrics = _biometrics;
     name = _name;
     id = _id;
-    addWhitelist(main)
-
+    addWhitelist(main);
   }
 
   function getMain() public returns(address){
@@ -110,7 +115,7 @@ contract User {
   }
 
   function readSymKey(address hashID) isPub{
-    bytes32 hashedKey = hashes[hashID].hashKey;
+    bytes32 hashedKey = hashes[hashID].keyHash;
 
     //bytes32 symKey = decrypt(hashedKey, privateKey);
   }
@@ -131,7 +136,6 @@ contract User {
   function removeWhiteList(address _subKey) public notMain(_subKey) returns(bool){
     //Right now this leaves an empty index in the array.
     //Can be optimized to reduce array size.
-    uint i = whitelist.length;
     for (uint i = 0; i < whitelist.length; i++){
       if (whitelist[i] == _subKey){
         delete whitelist[i];
