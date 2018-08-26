@@ -68,9 +68,9 @@ contract User {
     return pub;
   }
 
-  function getBio() public returns(string){
-    emit ReturnBytes(bio);
-    return bio;
+  function getBio() public returns(bytes32){
+    emit ReturnBytes(biometrics);
+    return biometrics;
   }
 
   function getName() public returns(string){
@@ -83,7 +83,7 @@ contract User {
     return id;
   }
 
-  function getDead() public returns(string){
+  function getDead() public returns(bool){
     emit ReturnBool(dead);
     return dead;
   }
