@@ -8,7 +8,6 @@ contract User {
   bytes32 id;
   bool dead;
 
-  mapping(address => bool) whitelist;
 
   struct hashEntry{
     bytes32 dataHash;
@@ -21,8 +20,9 @@ contract User {
   event ReturnStr(string res);
   event ReturnBytes(bytes32 res);
 
-  //mapping id -> symmetric key hash
+  //mappings
   mapping(address => hashEntry) public hashes;
+  mapping(address => bool) whitelist;
 
 
   //modifiers
@@ -58,9 +58,24 @@ contract User {
     addWhitelist(main);
   }
 
+  function getMain() public returns(address){
+    emit ReturnAddr(main);
+    return main;
+  }
+
   function getPub() public returns(string){
     emit ReturnStr(pub);
     return pub;
+  }
+
+  function getBio() public returns(string){
+    emit ReturnBytes(bio);
+    return bio;
+  }
+
+  function getName() public returns(string){
+    emit ReturnStr(name);
+    return name;
   }
 
   function getID() public returns(bytes32){
@@ -68,10 +83,11 @@ contract User {
     return id;
   }
 
-  function getMain() public returns(address){
-    emit ReturnAddr(main);
-    return main;
+  function getDead() public returns(string){
+    emit ReturnBool(dead);
+    return dead;
   }
+
 
   function killUser() public isMain {
       dead = true;
