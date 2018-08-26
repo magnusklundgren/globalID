@@ -42,4 +42,12 @@ contract Controller {
     _user.addDocs(entityAddress, _dataHashed, keyHashed);
   }
 
+  function auth(string _privateKey, bytes32 _bio) public returns(bool) {
+    //decrypt bio;
+    //bool res = (biometrics == _bio); //check decrypted biometrics with parsed variable _bio
+    bool res = true;
+    emit ReturnBool(res);
+    return res;
+  }
+
 }

@@ -37,14 +37,6 @@ contract mainController is Controller {
     //send _privateKey to the user.
   }
 
-  function auth(string _privateKey, bytes32 _bio) public returns(bool) {
-    //decrypt bio;
-    //bool res = (biometrics == _bio); //check decrypted biometrics with parsed variable _bio
-    bool res = true;
-    emit ReturnBool(res);
-    return res;
-  }
-
   function transferMain(User _user, address _newMain) public {
     revokeVerification(_user.getID(), _user.getMain());
     _user.transferMain(_newMain);
