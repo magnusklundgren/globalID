@@ -2,19 +2,20 @@ pragma solidity ^0.4.24;
 
 contract User {
   address main;
-  string pub;
+  string pub; //Public key
   bytes32 biometrics; //This is encrypted.
   string name;
-  bytes32 id;
+  bytes32 id; //Unique identifier for every individual
   bool dead;
 
-
+  //For saving hashes of the data and the symmeytric key
+  //Mapped to the address of the provider.
   struct hashEntry{
     bytes32 dataHash;
     bytes32 keyHash;
   }
 
-  //events
+  //events to return values for the interface
   event ReturnBool(bool res);
   event ReturnAddr(address res);
   event ReturnStr(string res);
@@ -24,15 +25,14 @@ contract User {
   mapping(address => hashEntry) public hashes;
   mapping(address => bool) whitelist;
 
-
   //modifiers
   modifier notMain(address _subKey) {
-    assert(_subKey != main);
+    require(_subKey != main);
     _;
   }
 
   modifier isMain() {
-    assert(msg.sender == main);
+    require(msg.sender == main);
     _;
   }
 
@@ -58,6 +58,7 @@ contract User {
     addWhitelist(main);
   }
 
+  //Getter functions for all attributes.
   function getMain() public returns(address){
     emit ReturnAddr(main);
     return main;
@@ -101,12 +102,14 @@ contract User {
     pub = _pubKey;
   }
 
-  function readSymKey(address hashID) {
+  function readSymKey(address hashID) private {
     bytes32 hashedKey = hashes[hashID].keyHash;
 
     //bytes32 symKey = decrypt(hashedKey, privateKey);
+    //return symKey;
   }
 
+  //adds a new address, _subKey, to the whitelist
   function addWhitelist(address _subKey) public returns(bool) {
     if (whitelist[_subKey]) {
       emit ReturnBool(false);
@@ -117,9 +120,10 @@ contract User {
     return true;
   }
 
+  //removes address, _subKey, from the whitelist as long as it is not the main address
   function removeWhiteList(address _subKey) public notMain(_subKey) returns(bool) {
     if (whitelist[_subKey]) {
-      // Setting it to false is the same as delete.
+      // Setting it to false has the same effect here as delete
       whitelist[_subKey] = false;
       emit ReturnBool(true);
       return true;
@@ -128,11 +132,13 @@ contract User {
     return false;
   }
 
+  //used to add an entry in the hashes mapping
   function addDocs(address _thirdParty, bytes32 _dataHash, bytes32 _keyHash)
   public isWhitelist(_thirdParty) validSender(_thirdParty) {
     hashes[_thirdParty] = hashEntry(_dataHash, _keyHash);
   }
 
+  //removes an entry from the hashes mapping.
   function removeDocs(address _thirdParty)
   public isWhitelist(_thirdParty) validSender(_thirdParty) {
     delete(hashes[_thirdParty]);
